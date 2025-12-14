@@ -1,0 +1,14 @@
+# Build artifacts
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Playwright state
+.playwright/
+.playwright-*/
+
+# Env files
+.env
+.cookies.json
