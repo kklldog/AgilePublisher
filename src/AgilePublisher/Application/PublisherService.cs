@@ -7,11 +7,11 @@ public class PublisherService
 {
     private readonly Dictionary<string, IPublisher> _publishers;
 
-    public PublisherService(PlaywrightSettings settings, ZhihuSelectors? zhihuSelectors = null)
+    public PublisherService(PlaywrightSettings settings, ZhihuSelectors? zhihuSelectors = null, string? zhihuScriptPath = null)
     {
         _publishers = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["zhihu"] = new ZhihuPublisher(settings, zhihuSelectors)
+            ["zhihu"] = new ZhihuPublisher(settings, zhihuSelectors, zhihuScriptPath is null ? null : new ZhihuScriptExecutor(zhihuScriptPath))
         };
     }
 

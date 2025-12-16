@@ -13,6 +13,7 @@ var userDataDirOption = new Option<string?>(name: "--user-data-dir", description
 var headlessOption = new Option<bool>(name: "--headless", description: "Run browser headless", getDefaultValue: () => true);
 var slowMoOption = new Option<float>(name: "--slow-mo", description: "Playwright slow motion delay (ms)", getDefaultValue: () => 0);
 var timeoutOption = new Option<int?>(name: "--launch-timeout", description: "Browser launch timeout (ms)");
+var zhihuScriptOption = new Option<string?>(name: "--zhihu-script", description: "Path to Zhihu publish script (JSON steps)", getDefaultValue: () => "scripts/zhihu-script.json");
 
 var rootCommand = new RootCommand("Publish Markdown articles using Playwright automation");
 rootCommand.AddOption(platformOption);
@@ -25,15 +26,16 @@ rootCommand.AddOption(userDataDirOption);
 rootCommand.AddOption(headlessOption);
 rootCommand.AddOption(slowMoOption);
 rootCommand.AddOption(timeoutOption);
+rootCommand.AddOption(zhihuScriptOption);
 
-rootCommand.SetHandler(async (platform, markdownPath, title, coverImage, tags, publish, userDataDir, headless, slowMo, timeout) =>
+rootCommand.SetHandler(async (platform, markdownPath, title, coverImage, tags, publish, userDataDir, headless, slowMo, timeout, zhihuScriptPath) =>
 {
     var content = MarkdownLoader.Load(markdownPath, title);
     var request = new PublishRequest(content, tags, coverImage, publish);
     var settings = new PlaywrightSettings(headless, userDataDir, slowMo, timeout);
 
-    var service = new PublisherService(settings);
+    var service = new PublisherService(settings, zhihuScriptPath: zhihuScriptPath);
     await service.PublishAsync(platform, request);
-}, platformOption, markdownOption, titleOption, coverOption, tagOption, publishOption, userDataDirOption, headlessOption, slowMoOption, timeoutOption);
+}, platformOption, markdownOption, titleOption, coverOption, tagOption, publishOption, userDataDirOption, headlessOption, slowMoOption, timeoutOption, zhihuScriptOption);
 
 return await rootCommand.InvokeAsync(args);

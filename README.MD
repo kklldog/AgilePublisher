@@ -36,6 +36,24 @@ DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 dotnet run --project src/AgilePublisher 
 - `--publish`：直接发布；不传则默认保存为草稿。
 - `--user-data-dir`：Playwright 持久化目录，用于保持登录状态。
 - `--headless false`：需要调试时关闭 headless。
+- `--zhihu-script`：可选，指定知乎发布脚本 JSON 路径（默认 `scripts/zhihu-script.json`）。
+
+### Zhihu 脚本录制
+
+选择知乎平台时，会读取 `--zhihu-script` 指定的 JSON 脚本，按步骤自动打开发布页面并把 Markdown 标题、正文写入编辑器。脚本可以通过 Playwright 录制后导出并随时调整，例如：
+
+```json
+[
+  { "action": "goto", "value": "https://www.zhihu.com/write" },
+  { "action": "waitForSelector", "selector": "textarea[placeholder='请输入标题']" },
+  { "action": "fill", "selector": "textarea[placeholder='请输入标题']", "value": "{{title}}" },
+  { "action": "waitForSelector", "selector": "div.public-DraftEditor-content" },
+  { "action": "click", "selector": "div.public-DraftEditor-content" },
+  { "action": "fill", "selector": "div.public-DraftEditor-content", "value": "{{body}}" }
+]
+```
+
+其中 `{{title}}` 与 `{{body}}` 会在运行时替换为 Markdown 解析后的标题和正文，便于定期更新脚本而无需改动代码。
 
 ## 扩展到其他平台
 1. 在 `Publishers` 命名空间下实现新的 `IPublisher`，参照 `ZhihuPublisher`。
