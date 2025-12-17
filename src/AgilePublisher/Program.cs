@@ -13,7 +13,7 @@ var userDataDirOption = new Option<string?>(name: "--user-data-dir", description
 var headlessOption = new Option<bool>(name: "--headless", description: "Run browser headless", getDefaultValue: () => true);
 var slowMoOption = new Option<float>(name: "--slow-mo", description: "Playwright slow motion delay (ms)", getDefaultValue: () => 0);
 var timeoutOption = new Option<int?>(name: "--launch-timeout", description: "Browser launch timeout (ms)");
-var zhihuScriptOption = new Option<string?>(name: "--zhihu-script", description: "Path to Zhihu publish script (JSON steps)", getDefaultValue: () => "scripts/zhihu-script.json");
+var zhihuScriptOption = new Option<string?>(name: "--zhihu-script", description: "Path to Zhihu publish script assembly (C#)");
 
 var rootCommand = new RootCommand("Publish Markdown articles using Playwright automation");
 rootCommand.AddOption(platformOption);

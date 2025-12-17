@@ -5,17 +5,17 @@ namespace AgilePublisher.Publishers;
 
 public sealed class ZhihuPublisher : PlaywrightPublisherBase
 {
-    private readonly ZhihuScriptExecutor _scriptExecutor;
+    private readonly IZhihuPublishScript _script;
 
-    public ZhihuPublisher(PlaywrightSettings settings, ZhihuSelectors? selectors = null, ZhihuScriptExecutor? scriptExecutor = null)
+    public ZhihuPublisher(PlaywrightSettings settings, IZhihuPublishScript script)
         : base(settings)
     {
-        _scriptExecutor = scriptExecutor ?? new ZhihuScriptExecutor(Path.Combine(AppContext.BaseDirectory, "scripts", "zhihu-script.json"));
+        _script = script;
     }
 
     protected override async Task PublishInternalAsync(IPage page, PublishRequest request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        await _scriptExecutor.ExecuteAsync(page, request.Content, cancellationToken);
+        await _script.ExecuteAsync(page, request.Content, cancellationToken);
     }
 }

@@ -36,24 +36,45 @@ DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 dotnet run --project src/AgilePublisher 
 - `--publish`：直接发布；不传则默认保存为草稿。
 - `--user-data-dir`：Playwright 持久化目录，用于保持登录状态。
 - `--headless false`：需要调试时关闭 headless。
-- `--zhihu-script`：可选，指定知乎发布脚本 JSON 路径（默认 `scripts/zhihu-script.json`）。
+- `--zhihu-script`：可选，指定知乎发布脚本 **C# 程序集** 路径（运行时动态加载）。
 
-### Zhihu 脚本录制
+### Zhihu C# 发布脚本
 
-选择知乎平台时，会读取 `--zhihu-script` 指定的 JSON 脚本，按步骤自动打开发布页面并把 Markdown 标题、正文写入编辑器。脚本可以通过 Playwright 录制后导出并随时调整，例如：
+选择知乎平台时，会读取 `--zhihu-script` 指定的 **C# 脚本程序集**，在运行时反射加载并执行步骤。你可以提前录制好交互逻辑并编译为 DLL，便于定期维护而无需改动主应用程序。仓库提供了示例脚本 `scripts/ZhihuPublishScript.cs`，内容如下：
 
-```json
-[
-  { "action": "goto", "value": "https://www.zhihu.com/write" },
-  { "action": "waitForSelector", "selector": "textarea[placeholder='请输入标题']" },
-  { "action": "fill", "selector": "textarea[placeholder='请输入标题']", "value": "{{title}}" },
-  { "action": "waitForSelector", "selector": "div.public-DraftEditor-content" },
-  { "action": "click", "selector": "div.public-DraftEditor-content" },
-  { "action": "fill", "selector": "div.public-DraftEditor-content", "value": "{{body}}" }
-]
+```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using AgilePublisher.Models;
+using AgilePublisher.Publishers;
+using Microsoft.Playwright;
+
+public sealed class RecordedZhihuScript : IZhihuPublishScript
+{
+    public async Task ExecuteAsync(IPage page, ArticleContent content, CancellationToken cancellationToken)
+    {
+        await page.GotoAsync("https://www.zhihu.com/write", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+
+        await page.WaitForSelectorAsync("textarea[placeholder='请输入标题']", new PageWaitForSelectorOptions { Timeout = 15000 });
+        await page.FillAsync("textarea[placeholder='请输入标题']", content.Title);
+
+        await page.WaitForSelectorAsync("div.NotionEditor", new PageWaitForSelectorOptions { Timeout = 15000 });
+        await page.ClickAsync("div.NotionEditor");
+        await page.FillAsync("div.NotionEditor", content.Body);
+    }
+}
 ```
 
-其中 `{{title}}` 与 `{{body}}` 会在运行时替换为 Markdown 解析后的标题和正文，便于定期更新脚本而无需改动代码。
+将脚本编译为独立的类库（例如 `dotnet build -o ./scripts/out`），然后在运行命令时传入输出的 DLL：
+
+```bash
+DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 dotnet run --project src/AgilePublisher -- \
+  --platform zhihu \
+  --markdown ./post.md \
+  --zhihu-script ./scripts/out/RecordedZhihuScript.dll
+```
+
+如果未提供 `--zhihu-script`，工具会使用内置的默认脚本，包含打开写作页面并填充标题与正文的基本步骤。
 
 ## 扩展到其他平台
 1. 在 `Publishers` 命名空间下实现新的 `IPublisher`，参照 `ZhihuPublisher`。

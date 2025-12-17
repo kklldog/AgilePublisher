@@ -9,9 +9,14 @@ public class PublisherService
 
     public PublisherService(PlaywrightSettings settings, ZhihuSelectors? zhihuSelectors = null, string? zhihuScriptPath = null)
     {
+        var selectors = zhihuSelectors ?? ZhihuSelectors.Default;
+        var script = zhihuScriptPath is null
+            ? new DefaultZhihuPublishScript(selectors)
+            : new ZhihuScriptLoader(zhihuScriptPath).Load();
+
         _publishers = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["zhihu"] = new ZhihuPublisher(settings, zhihuSelectors, zhihuScriptPath is null ? null : new ZhihuScriptExecutor(zhihuScriptPath))
+            ["zhihu"] = new ZhihuPublisher(settings, script)
         };
     }
 
