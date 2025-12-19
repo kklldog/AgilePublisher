@@ -32,6 +32,9 @@
             tbxMdFile = new TextBox();
             btnSelect = new Button();
             btnCnblogs = new Button();
+            button1 = new Button();
+            button2 = new Button();
+            txtLog = new TextBox();
             SuspendLayout();
             // 
             // btnZhihu
@@ -71,17 +74,49 @@
             btnCnblogs.UseVisualStyleBackColor = true;
             btnCnblogs.Click += button1_Click_1;
             // 
+            // button1
+            // 
+            button1.Location = new Point(1171, 127);
+            button1.Name = "button1";
+            button1.Size = new Size(219, 131);
+            button1.TabIndex = 4;
+            button1.Text = "MdNice";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_2;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(592, 127);
+            button2.Name = "button2";
+            button2.Size = new Size(219, 131);
+            button2.TabIndex = 5;
+            button2.Text = "Wechat";
+            button2.UseVisualStyleBackColor = true;
+            button2.Click += button2_Click_1;
+            // 
+            // txtLog
+            // 
+            txtLog.Location = new Point(46, 335);
+            txtLog.Multiline = true;
+            txtLog.Name = "txtLog";
+            txtLog.Size = new Size(1344, 571);
+            txtLog.TabIndex = 6;
+            txtLog.Text = " playwright codegen https://mp.weixin.qq.com/";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1413, 930);
+            Controls.Add(txtLog);
+            Controls.Add(button2);
+            Controls.Add(button1);
             Controls.Add(btnCnblogs);
             Controls.Add(btnSelect);
             Controls.Add(tbxMdFile);
             Controls.Add(btnZhihu);
             Name = "Form1";
-            Text = "Form1";
+            Text = "Publisher";
             Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -93,5 +128,8 @@
         private TextBox tbxMdFile;
         private Button btnSelect;
         private Button btnCnblogs;
+        private Button button1;
+        private Button button2;
+        private TextBox txtLog;
     }
 }
